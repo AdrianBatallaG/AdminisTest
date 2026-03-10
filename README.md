@@ -31,3 +31,26 @@ npm run dev
 
 - API: `http://localhost:8000`
 - Frontend: `http://localhost:5173`
+
+## Laravel Cloud (monorepo)
+
+Laravel Cloud detecta frameworks desde la raiz. Como la app Laravel vive en `API/`, este repositorio incluye un `composer.lock` en raiz para habilitar deteccion.
+
+En la app de Laravel Cloud usa un **Build Script** para desplegar desde `API/`:
+
+```bash
+mkdir /tmp/monorepo_tmp
+repos=("API" "Frontend")
+
+for item in "${repos[@]}"; do
+    mv $item /tmp/monorepo_tmp/
+done
+
+cp -Rf /tmp/monorepo_tmp/API/{.,}* .
+rm -rf /tmp/monorepo_tmp
+
+composer install --no-dev --optimize-autoloader
+php artisan package:discover --ansi
+php artisan config:cache
+php artisan route:cache
+```
